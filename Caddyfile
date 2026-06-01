@@ -1,0 +1,12 @@
+{
+    admin off
+    frankenphp
+}
+
+:9000 {
+    root * /app/public
+
+    encode zstd br gzip
+
+    php_server
+}
