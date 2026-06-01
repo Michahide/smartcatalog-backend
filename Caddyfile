@@ -1,12 +1,21 @@
 {
     admin off
-    frankenphp
+    frankenphp {
+        php_ini output_buffering Off
+    }
 }
 
 :9000 {
     root * /app/public
 
-    encode zstd br gzip
+    @notstream {
+        not path /api/chat*
+    }
+    encode @notstream zstd br gzip
+
+    header {
+        X-Accel-Buffering "no"
+    }
 
     php_server
 }
