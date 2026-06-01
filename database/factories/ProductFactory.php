@@ -262,7 +262,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         // Pick a random category
-        $categoryKey = $this->faker->randomElement(array_keys($this->catalogue));
+        $categoryKey = fake()->randomElement(array_keys($this->catalogue));
         return $this->buildForCategory($categoryKey);
     }
 
@@ -312,14 +312,14 @@ class ProductFactory extends Factory
     {
         return $this->state(fn () => [
             'is_recommended' => true,
-            'rating'         => $this->faker->randomFloat(1, 4.5, 5.0),
-            'rating_count'   => $this->faker->numberBetween(400, 2500),
+            'rating'         => fake()->randomFloat(1, 4.5, 5.0),
+            'rating_count'   => fake()->numberBetween(400, 2500),
         ]);
     }
 
     public function lowStock(): static
     {
-        return $this->state(fn () => ['stock' => $this->faker->numberBetween(1, 5)]);
+        return $this->state(fn () => ['stock' => fake()->numberBetween(1, 5)]);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -329,33 +329,33 @@ class ProductFactory extends Factory
     private function buildForCategory(string $categoryKey): array
     {
         $cat  = $this->catalogue[$categoryKey];
-        [$name, $minPrice, $maxPrice] = $this->faker->randomElement($cat['products']);
+        [$name, $minPrice, $maxPrice] = fake()->randomElement($cat['products']);
 
         // Add subtle price variation to avoid duplicates from the same template
-        $priceVariant = $this->faker->numberBetween(0, 3);
+        $priceVariant = fake()->numberBetween(0, 3);
         $multipliers  = [1.00, 1.05, 0.95, 1.10];
-        $price        = (int) round($this->faker->numberBetween($minPrice, $maxPrice) * $multipliers[$priceVariant] / 1000) * 1000;
+        $price        = (int) round(fake()->numberBetween($minPrice, $maxPrice) * $multipliers[$priceVariant] / 1000) * 1000;
 
-        $rating      = $this->faker->randomFloat(1, 3.5, 5.0);
-        $ratingCount = $this->faker->numberBetween(12, 3000);
-        $stock       = $this->faker->numberBetween(0, 250);
+        $rating      = fake()->randomFloat(1, 3.5, 5.0);
+        $ratingCount = fake()->numberBetween(12, 3000);
+        $stock       = fake()->numberBetween(0, 250);
 
         // High-rated, popular products are more likely to be recommended
         $popularityScore = ($rating / 5.0) * 0.5 + (min($ratingCount, 1000) / 1000) * 0.5;
-        $isRecommended   = $this->faker->boolean((int) ($popularityScore * 35));
+        $isRecommended   = fake()->boolean((int) ($popularityScore * 35));
 
         // Pick 1-3 tags from the category pool
         $tagPool = $cat['tags'];
-        $tags    = $this->faker->randomElements($tagPool, $this->faker->numberBetween(1, count($tagPool)));
+        $tags    = fake()->randomElements($tagPool, fake()->numberBetween(1, count($tagPool)));
 
         return [
             'name'         => $name,
-            'slug'         => Str::slug($name) . '-' . $this->faker->unique()->numberBetween(10000, 99999),
+            'slug'         => Str::slug($name) . '-' . fake()->unique()->numberBetween(10000, 99999),
             'category'     => $categoryKey,
             'price'        => $price,
             'rating'       => $rating,
             'rating_count' => $ratingCount,
-            'emoji'        => $this->faker->randomElement($cat['emoji']),
+            'emoji'        => fake()->randomElement($cat['emoji']),
             'description'  => $this->generateDescription($name, $categoryKey, $price),
             'stock'        => $stock,
             'tags'         => $tags,
@@ -381,7 +381,7 @@ class ProductFactory extends Factory
         ];
 
         $desc = $descriptors[$category] ?? ['kualitas terbaik', 'produk pilihan'];
-        $attr = $this->faker->randomElement($desc);
+        $attr = fake()->randomElement($desc);
 
         $templates = [
             "{$name} hadir dengan {$attr}, menjadikannya pilihan ideal bagi yang menginginkan pengalaman terbaik. Harga {$priceFormatted} untuk kualitas premium yang tak perlu diragukan.",
@@ -389,6 +389,6 @@ class ProductFactory extends Factory
             "{$name} merupakan produk unggulan kategori {$category} dengan {$attr}. Dipilih oleh ribuan pelanggan puas. Dapatkan sekarang seharga {$priceFormatted}.",
         ];
 
-        return $this->faker->randomElement($templates);
+        return fake()->randomElement($templates);
     }
 }
